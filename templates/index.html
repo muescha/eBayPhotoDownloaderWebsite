@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download eBay Images</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+        .ebay-gradient {
+            background: linear-gradient(135deg, #e43137 0%, #0063d1 25%, #f4ae01 50%, #85b716 100%);
+        }
+        .ebay-button {
+            background-color: #85b716;
+            border: none;
+        }
+        .ebay-button:hover {
+            background-color: #0063d1;
+        }
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="ebay-gradient">
+    <div class="flex items-center justify-center h-screen">
+        <div class="bg-white p-8 rounded-lg shadow-2xl max-w-lg w-full">
+            <h1 class="text-4xl text-center text-gray-800 mb-6 font-bold">eBay Photo Downloader</h1>
+            <p class="text-center text-gray-600 mb-8">Quickly and easily download all the photos from any eBay listing by simply entering the URL below.</p>
+            <form action="/" method="POST" onsubmit="showLoader()">
+                <div class="flex flex-col items-center">
+                    <input type="text" name="ebayUrl" class="w-full p-4 rounded-lg border-2 border-gray-300 mb-6" placeholder="Enter eBay URL here">
+                    <button type="submit" class="ebay-button bg-[#85b716] text-white px-8 py-4 rounded-lg transition duration-300 ease-in-out">
+                        <i class="fas fa-download mr-3"></i>Download Photos
+                    </button>
+                    <div class="loader hidden" id="loader"></div>
+                </div>
+            </form>
+            <div class="mt-10 text-center">
+                <h2 class="text-2xl text-gray-800 mb-4">How it works</h2>
+                <p class="text-gray-600 mb-3">1. Paste the eBay listing URL into the field above.</p>
+                <p class="text-gray-600 mb-3">2. Click the "Download Photos" button to begin.</p>
+                <p class="text-gray-600 mb-3">3. Your photos will be previewed and downloaded in a zip file.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showLoader() {
+            document.getElementById('loader').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
