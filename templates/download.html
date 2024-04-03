@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Download Images</title>
+    <title>Download Images for {{ ebay_id }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
     <style>
@@ -105,7 +105,7 @@
             <span class="close" onclick="closeModal()">&times;</span>
             <img class="modal-content" id="img01">
         </div>
-        <a href="{{ url_for('download_all') }}" class="download-button">Download All Images</a>
+        <a href="{{ url_for('download_all', ebay_id=ebay_id) }}" class="download-button">Download All Images for {{ ebay_id }}</a>
     </div>
     <script>
         function openModal(imageUrl) {

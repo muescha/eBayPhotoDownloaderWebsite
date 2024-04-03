@@ -15,6 +15,8 @@ app = Flask(__name__)
 IMAGES_DIR = "ebay_images"
 IMAGE_LIFETIME = 3600  # Lifetime of images in seconds (e.g., 1 hour)
 
+EBAY_ID_RE = re.compile('http.*://www.ebay.*/itm.*/(.*)')
+
 if not os.path.exists(IMAGES_DIR):
     os.makedirs(IMAGES_DIR)
 
@@ -41,10 +43,11 @@ def home():
     if request.method == 'POST':
         ebay_url = request.form.get('ebayUrl')
         if ebay_url:
+            ebay_id = EBAY_ID_RE.findall(ebay_url)[0]
             # Download images and get filenames
-            filenames = download_ebay_listing_images(ebay_url)
+            filenames = download_ebay_listing_images(ebay_url, ebay_id)
             # Redirect to the download page with filenames as query parameters
-            return redirect(url_for('download_page', filenames=",".join(filenames)))
+            return redirect(url_for('download_page', ebay_id=ebay_id, filenames=",".join(filenames)))
     return render_template('index.html')
 
 @app.route('/download', methods=['GET'])
@@ -52,45 +55,48 @@ def download_page():
     if not os.path.exists(IMAGES_DIR):
         os.makedirs(IMAGES_DIR)
     filenames = request.args.get('filenames', '').split(',')
+    ebay_id = request.args.get('ebay_id', '')
     files = [f for f in filenames if f]  # Filter out empty strings
-    return render_template('download.html', files=files)
+    return render_template('download.html', ebay_id=ebay_id, files=files)
 
 @app.route('/download/<filename>')
 def download_file(filename):
     return send_from_directory(IMAGES_DIR, filename, as_attachment=True)
 
-@app.route('/download/all')
-def download_all():
+@app.route('/download/all/<ebay_id>')
+def download_all(ebay_id):
     memory_file = BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
         for root, dirs, files in os.walk(IMAGES_DIR):
             for file in files:
-                zf.write(os.path.join(root, file), arcname=file)
+                if file.startswith(f"{ebay_id}_"):
+                    zf.write(os.path.join(root, file), arcname=file)
     memory_file.seek(0)
-    return send_file(memory_file, mimetype='application/zip', as_attachment=True, download_name='ebay_images.zip')
+    return send_file(memory_file, mimetype='application/zip', as_attachment=True, download_name=f"{ebay_id}_ebay_images.zip")
 
-def download_ebay_listing_images(ebay_url):
+def download_ebay_listing_images(ebay_url, ebay_id):
+
     response = requests.get(ebay_url)
     response.raise_for_status()
-    
+
     soup = BeautifulSoup(response.text, 'html.parser')
     image_urls = set(re.findall(r'(https://i\.ebayimg\.com/images/g/[A-Za-z0-9\-_]+/s-l1600\.(jpg|png))', soup.prettify()))
     image_urls = {match[0] for match in image_urls}
-    
+
     downloaded_files = []
     for index, url in enumerate(image_urls, start=1):
         file_extension = url.split('.')[-1]
-        file_name = f"image_{index}.{file_extension}"
+        file_name = f"{ebay_id}_image_{index}.{file_extension}"
         image_response = requests.get(url)
         image_response.raise_for_status()
-        
+
         image_path = os.path.join(IMAGES_DIR, file_name)
         if not os.path.exists(IMAGES_DIR):
             os.makedirs(IMAGES_DIR)
         with open(image_path, 'wb') as file:
             file.write(image_response.content)
         downloaded_files.append(file_name)
-    
+
     return downloaded_files
 
 if __name__ == "__main__":
