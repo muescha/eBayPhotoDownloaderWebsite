@@ -25,3 +25,11 @@ The eBay Photo Downloader is a web application designed to simplify the process 
 ## Getting Started
 
 To use the eBay Photo Downloader, simply navigate to the application's URL, enter the eBay listing URL into the designated field, and click the "Download Photos" button. The application will then guide you through the process of previewing and downloading the images.
+
+## Debug
+
+To execute it locally, use this command with the `gunicorn.config.py` file:
+
+```shell
+gunicorn app:app -c gunicorn.config.py
+```
